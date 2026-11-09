@@ -1,0 +1,117 @@
+<div class="app-shell">
+  <!-- Top Heritage Navigation Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-box">
+        <span class="logo-icon">🚂</span>
+        <div class="logo-text-col">
+          <span class="logo-title">GITJOURNEY</span>
+          <span class="logo-sub">TRANSIT LINE & MILESTONE CARTOGRAPHY</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Active Route Pill -->
+      <div class="current-line-pill">
+        <span class="pill-signal"></span>
+        <span class="pill-label">LINE:</span>
+        <span class="pill-route">{{ currentRepo() }}</span>
+      </div>
+
+      <!-- Sound FX Toggle -->
+      <button
+        type="button"
+        class="sound-toggle-btn"
+        (click)="toggleAudio()"
+        [title]="audioMuted() ? 'Unmute Sound Effects' : 'Mute Sound Effects'"
+      >
+        @if (audioMuted()) {
+          <span class="sound-icon">🔇</span>
+          <span class="sound-text">Muted</span>
+        } @else {
+          <span class="sound-icon">🔊</span>
+          <span class="sound-text">Sound ON</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="main-content">
+    <!-- Notice Banners (Rate Limit / Error) -->
+    @if (rateLimitNotice()) {
+      <div class="notice-banner warning-banner animate-fade-in">
+        <span class="banner-icon">⚡</span>
+        <div class="banner-text-col">
+          <span class="banner-title">OFFLINE / RATE LIMIT SAFEGUARD</span>
+          <span class="banner-msg">{{ rateLimitNotice() }}</span>
+        </div>
+        <button type="button" class="banner-action-btn" (click)="loadDemoShowcase()">
+          Refresh Showcase
+        </button>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="notice-banner error-banner animate-fade-in">
+        <span class="banner-icon">🛑</span>
+        <div class="banner-text-col">
+          <span class="banner-title">WAYPOINT NOT FOUND</span>
+          <span class="banner-msg">{{ errorMessage() }}</span>
+        </div>
+        <button type="button" class="banner-action-btn" (click)="loadDemoShowcase()">
+          Switch to Showcase Route
+        </button>
+      </div>
+    }
+
+    <!-- Search & Dispatcher Bar -->
+    <section class="section-container">
+      <app-repo-input
+        [loading]="isLoading()"
+        (loadRepo)="loadRepo($event)"
+        (loadDemo)="loadDemoShowcase()"
+      ></app-repo-input>
+    </section>
+
+    <!-- Metrics Bar -->
+    <section class="section-container">
+      <app-journey-metrics [metrics]="metrics()"></app-journey-metrics>
+    </section>
+
+    <!-- Interactive Railway Map -->
+    <section class="section-container">
+      <app-station-map
+        [stations]="stations()"
+        [activeStationIndex]="activeStationIndex()"
+        [playbackSpeed]="playbackSpeed()"
+        (stationSelect)="onStationSelected($event)"
+        (stationArrive)="onStationArrive($event)"
+        (journeyComplete)="onJourneyComplete()"
+        (togglePlayEvent)="onTogglePlay()"
+      ></app-station-map>
+    </section>
+  </main>
+
+  <!-- Station Inspector Boarding Pass Modal -->
+  @if (selectedStation()) {
+    <app-station-inspector
+      [station]="selectedStation()"
+      [hasNext]="activeStationIndex() < stations().length - 1"
+      [hasPrev]="activeStationIndex() > 0"
+      (close)="onCloseInspector()"
+      (next)="onNextStation()"
+      (prev)="onPrevStation()"
+    ></app-station-inspector>
+  }
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <span>Built with Angular Signals, Web Audio API procedural synthesis, and SVG track cartography.</span>
+      <span class="bullet">•</span>
+      <span>Engineered for zero main-thread jank & offline fallback.</span>
+    </div>
+  </footer>
+</div>
